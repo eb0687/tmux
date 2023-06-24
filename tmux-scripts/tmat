@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+
 # Attach or create tmux session named the same as current directory.
 # Source: https://thoughtbot.com/upcase/videos/tmux-navigation
 
