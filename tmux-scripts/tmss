@@ -6,6 +6,10 @@
 
 SESSION=$(tmux list-sessions -F "#S" | fzf-tmux -p 80%,60% --prompt=" " --header="Switch tmux session:" --header-first)
 
+if [[ -z $SESSION ]]; then
+    exit 0
+fi
+
 if [ -n "$TMUX" ]; then
     tmux switch-client -t "$SESSION"
 else

@@ -1,0 +1,25 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-git-popup-window
+
+# Version:          0.1
+
+# Description:
+# This is a helper script for quickly accessing a new terminal session called 'SCRATCH' while in a tmux session. 
+# This script must exist in your path to work (for example: ~/.local/bin)
+# NOTE: It is functional but still a wip.
+
+# Dependencies:
+# - Tmux
+# - Git
+
+# Date created:     28/06/2023
+# Last updated:     28/06/2023
+# ----------------------------------------------------------------------------
+
+SESSION_NAME='SCRATCH'
+
+tmux new-session -A -s "$SESSION_NAME"\; detach
+tmux attach -t "$SESSION_NAME"\; set-buffer "clear; git status"\; paste-buffer\; send-keys Enter
+tmux attach -t "$SESSION_NAME"
