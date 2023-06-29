@@ -1,143 +1,65 @@
-#!/bin/sh
-##################################################
-#
-# Creator: Eb
-# Date created: Sun Mar 13 12:19:54 PM +03 2022
-# Last update:
-# Version: 1.0
-#
-##################################################
-#
-# Description:
-# SOURCE: http://effectif.com/system-administration/battery-status-in-tmux 
-#
-##################################################
+#!/bin/bash
 
+function battery_meter() {
 
-HEART_FULL=♥
-HEART_EMPTY=♡
-[ -z "$NUM_HEARTS" ] &&
-    NUM_HEARTS=5
+    if [ "$(which acpi)" ]; then
 
-cutinate()
-{
-    perc=$1
-    inc=$(( 100 / $NUM_HEARTS))
+        # Set the default color to the local variable fgdefault.
+        local fgdefault='#[default]'
 
+        if [ "$(cat /sys/class/power_supply/AC/online)" == 1 ] ; then
 
-    for i in `seq $NUM_HEARTS`; do
-        if [ $perc -lt 100 ]; then
-            echo $HEART_EMPTY
+            local icon='🗲 '
+            local charging='+'
+
         else
-            echo $HEART_FULL
+
+            local icon=''
+            local charging='-'
+
         fi
-        perc=$(( $perc + $inc ))
-    done
-}
 
-linux_get_bat ()
-{
-    echo $(( $BAT_TOTAL / $BAT_COUNT ))
-}
+        # Check for existence of a battery.
+        if [ -x /sys/class/power_supply/BAT0 ] ; then
 
-openbsd_get_bat ()
-{
-    bf=$(sysctl -n hw.sensors.acpibat0.amphour0 |  cut -d ' ' -f 1)
-    bn=$(sysctl -n hw.sensors.acpibat0.amphour3 |  cut -d ' ' -f 1)
-    echo "(($bn * 100) / $bf)" | bc -l | awk -F '.' '{ print $1 }';
-}
+            batt0=$(acpi -b 2> /dev/null | awk '/Battery 0/{print $4}' | cut -d, -f1)
 
-freebsd_get_bat ()
-{
-    sysctl -n hw.acpi.battery.life
-}
+            case $batt0 in
 
-battery_status()
-{
-case $(uname -s) in
-    "Linux")
-        BATTERIES=$(ls /sys/class/power_supply | grep BAT)
-        BAT_COUNT=$(ls /sys/class/power_supply | grep BAT | wc -l)
-        for BATTERY in $BATTERIES; do
-            BAT_PATH=/sys/class/power_supply/$BATTERY
-            STATUS=$BAT_PATH/status
-            [ "$1" = `cat $STATUS` ] || [ "$1" = "" ] || return 0
-            if [ -f "$BAT_PATH/energy_full" ]; then
-                naming="energy"
-            elif [ -f "$BAT_PATH/charge_full" ]; then
-                naming="charge"
-            elif [ -f "$BAT_PATH/capacity" ]; then
-                cat "$BAT_PATH/capacity"
-                return 0
-            fi
-            BAT_PERCENT=$(( 100 * $(cat $BAT_PATH/${naming}_now) / $(cat $BAT_PATH/${naming}_full) ))
-            BAT_TOTAL=$(( ${BAT_TOTAL-0} + $BAT_PERCENT ))
-        done
-        linux_get_bat
-        ;;
-    "FreeBSD")
-        STATUS=`sysctl -n hw.acpi.battery.state`
-        case $1 in
-            "Discharging")
-                if [ $STATUS -eq 1 ]; then
-                    freebsd_get_bat
-                fi
-                ;;
-            "Charging")
-                if [ $STATUS -eq 2 ]; then
-                    freebsd_get_bat
-                fi
-                ;;
-            "")
-                freebsd_get_bat
-                ;;
-        esac
-        ;;
-    "OpenBSD")
-        openbsd_get_bat
-        ;;
-    "Darwin")
-        case $1 in
-            "Discharging")
-                ext="No";;
-            "Charging")
-                ext="Yes";;
-        esac
+                # From 100% to 75% display color grey.
+                100%|9[0-9]%|8[0-9]%|7[5-9]%) fgcolor='#[fg=brightgrey]' 
+                    ;;
 
-        ioreg -c AppleSmartBattery -w0 | \
-        grep -o '"[^"]*" = [^ ]*' | \
-        sed -e 's/= //g' -e 's/"//g' | \
-        sort | \
-        while read key value; do
-            case $key in
-                "MaxCapacity")
-                    export maxcap=$value;;
-                "CurrentCapacity")
-                    export curcap=$value;;
-                "ExternalConnected")
-                    if [ -n "$ext" ] && [ "$ext" != "$value" ]; then
-                        exit
-                    fi
-                ;;
-                "FullyCharged")
-                    if [ "$value" = "Yes" ]; then
-                        exit
-                    fi
-                ;;
+                # From 74% to 50% display color green.
+                7[0-4]%|6[0-9]%|5[0-9]%) fgcolor='#[fg=brightgreen]' 
+                    ;;
+
+                # From 49% to 25% display color yellow.
+                4[0-9]%|3[0-9]%|2[5-9]%) fgcolor='#[fg=brightyellow]' 
+                    ;;
+
+                # From 24% to 0% display color red.
+                2[0-4]%|1[0-9]%|[0-9]%) fgcolor='#[fg=brightred]'
+                    ;;
             esac
-            if [[ -n "$maxcap" && -n $curcap ]]; then
-                echo $(( 100 * $curcap / $maxcap ))
-                break
-            fi
-        done
-esac
+
+            # Display the percentage of charge the battery has.
+            printf "%s " "${fgcolor}${icon}${charging}${batt0}${fgdefault}"
+
+        fi
+    fi
 }
 
-BATTERY_STATUS=`battery_status $1`
-[ -z "$BATTERY_STATUS" ] && exit
+function date_time() {
 
-if [ -n "$CUTE_BATTERY_INDICATOR" ]; then
-    cutinate $BATTERY_STATUS
-else
-    echo ${BATTERY_STATUS}%
-fi
+    printf "%s " "$(date +'%d-%b %I:%M:%S')"
+
+}
+
+main ()
+{
+    battery_meter
+    date_time
+}
+
+main
