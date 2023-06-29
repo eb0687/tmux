@@ -59,7 +59,6 @@ function date_time() {
 main ()
 {
     battery_meter
-    date_time
 }
 
 main
