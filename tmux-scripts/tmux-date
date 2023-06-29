@@ -1,4 +1,19 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-date
+
+# Version:          0.1
+
+# Description:
+# tmux helper script to show the date & time in the tmux status bar.
+
+# Dependencies:
+# - tmux
+
+# Date created:     30/06/2023
+# Last updated:     30/06/2023
+# ----------------------------------------------------------------------------
 
 function date_time() {
 

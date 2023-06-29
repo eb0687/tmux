@@ -1,4 +1,21 @@
 #!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-battery
+
+# Version:          0.1
+
+# Description:
+# tmux helper script to show the laptop battery status in tmux.
+# SOURCE: https://dev.to/brandonwallace/make-your-tmux-status-bar-100-better-with-bash-2fne
+
+# Dependencies:
+# - acpi
+# - tmux
+
+# Date created:     30/06/2023
+# Last updated:     30/06/2023
+# ----------------------------------------------------------------------------
 
 function battery_meter() {
 

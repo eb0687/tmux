@@ -1,5 +1,6 @@
 # tmux
-My personal tmux config
+
+My personal tmux config WIP
 
 ## Installation instructions
 
@@ -10,3 +11,10 @@ use the below command to mv the file to the correct location~~
 ```
 mv ~/.config/tmux/tmux.conf ~/.tmux.conf
 ```
+
+## To do:
+
+- [ ] work on documentation
+- [ ] work on install script
+- [ ] [awesome-tmux](https://github.com/rothgar/awesome-tmux) 
+- [ ] [nested session article](https://www.freecodecamp.org/news/tmux-in-practice-local-and-nested-remote-tmux-sessions-4f7ba5db8795/) on tmux
