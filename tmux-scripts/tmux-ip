@@ -9,7 +9,8 @@ function ip_address() {
 
         read status < $file/operstate;
 
-        [ "$status" == "up" ] && ip addr show $iface | awk '/inet /{printf $2" "}'
+        # [ "$status" == "up" ] && ip addr show $iface | awk '/inet /{printf $2" "}'
+        [ "$status" == "up" ] && ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}'
 
     done
 
