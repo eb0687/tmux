@@ -16,5 +16,8 @@ mv ~/.config/tmux/tmux.conf ~/.tmux.conf
 
 - [ ] work on documentation
 - [ ] work on install script
-- [ ] [awesome-tmux](https://github.com/rothgar/awesome-tmux) 
-- [ ] [nested session article](https://www.freecodecamp.org/news/tmux-in-practice-local-and-nested-remote-tmux-sessions-4f7ba5db8795/) on tmux
+
+## References:
+
+- [awesome-tmux](https://github.com/rothgar/awesome-tmux) 
+- [nested session article](https://www.freecodecamp.org/news/tmux-in-practice-local-and-nested-remote-tmux-sessions-4f7ba5db8795/) on tmux
