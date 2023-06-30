@@ -1,0 +1,36 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-disk-free
+
+# Version:          0.1
+
+# Description:
+# Tmux script to show remaining disk space at root
+
+# Dependencies:
+# - tmux
+# - df
+
+# Date created:     30/06/2023
+# Last updated:     30/06/2023
+# ----------------------------------------------------------------------------
+
+disk_size()
+{
+    df -h / | awk '{print $2}' | tail -n 1
+}
+
+disk_used()
+{
+    df -h / | awk '{print $3}' | tail -n 1
+}
+
+main ()
+{
+    TOTAL_SIZE=$(disk_size)
+    USED_SIZE=$(disk_used)
+    echo "DISK:$TOTAL_SIZE/$USED_SIZE"
+}
+
+main
