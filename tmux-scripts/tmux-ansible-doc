@@ -19,11 +19,11 @@
 
 set -euo pipefail
 
-ANSIBLE_MODULE=$(ansible-doc --list_files | \
+ANSIBLE_MODULE=$(ansible-doc --list_files | awk -F'.' '{print$3}' | awk '{print $1}' | \
     fzf-tmux -m -p 80%,60% \
     --prompt=" " \
     --header="Select the ansible module:" \
-    --header-first )
+    --header-first)
 
 check_deps() {
     if ! hash "$1" 2>/dev/null; then
@@ -41,16 +41,19 @@ get_options ()
     echo "Window"
 }
 
+rename_window ()
+{
+    tmux rename-window -t python Ansible-Doc-"$1"
+}
+
 open_in_window ()
 {
     tmux new-window ansible-doc $ANSIBLE_MODULE
-    exit 0
 }
 
 open_in_split ()
 {
     tmux split-window -h -l 50% ansible-doc $ANSIBLE_MODULE
-    exit 0
 }
 
 main ()
@@ -67,12 +70,16 @@ main ()
     case "$CHOICE" in
         Split)
             open_in_split
+            exit 0
             ;;
         Window)
             open_in_window
+            rename_window "$ANSIBLE_MODULE"
+            exit 0
             ;;
         *)
             echo "invalid selection"
+            exit 1
             ;;
     esac
 }
