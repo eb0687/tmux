@@ -1,0 +1,76 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmlw
+
+# Version:          0.1
+
+# Description:
+# This is a bash script that lists all windows in a session and attaches to that window on selection
+
+# Dependencies:
+# - tmux
+# - fzf
+
+# Date created:     30/06/2023
+# Last updated:     30/06/2023
+# ----------------------------------------------------------------------------
+
+set -euo pipefail
+
+check_deps() {
+    if ! hash "$1" 2>/dev/null; then
+        echo "Error: This script requires $1!"
+        echo "Error: Please Install $1 using your distribution's package manager"
+        notify-send \
+            -t 5000 "Error: This script requires $1"
+        exit 1
+    fi
+}
+
+select_window ()
+{
+    TMUX_WINDOW=$(tmux list-window -F "#W" | \
+        fzf-tmux -p 80%,60% \
+        --prompt=" " \
+        --header="Switch tmux window:" \
+        --header-first)
+
+    if [[ -z $TMUX_WINDOW ]]; then
+        exit 1
+    fi
+
+    tmux select-window -t "$TMUX_WINDOW"
+    exit 0
+}
+
+attach_session ()
+{
+
+    TMUX_SESSION=$(tmux list-sessions -F "#S" | \
+        fzf-tmux -p 80%,60% \
+        --prompt=" " \
+        --header="Switch tmux session:" \
+        --header-first)
+
+    if [[ -z $TMUX_SESSION ]]; then
+        exit 1
+    fi
+
+    tmux attach-session -t "$TMUX_SESSION"
+    exit 0
+}
+
+main ()
+{
+    check_deps fzf
+    check_deps tmux
+
+    if [ -z "$TMUX" ]; then
+        attach_session
+    else
+        select_window
+    fi
+}
+
+main

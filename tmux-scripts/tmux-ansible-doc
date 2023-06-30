@@ -1,0 +1,80 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-ansible-doc
+
+# Version:          0.1
+
+# Description:
+# opens a tmux split with the ansible doc page of the selected ansible module
+
+# Dependencies:
+# - tmux
+# - fzf
+# - ansible
+
+# Date created:     30/06/2023
+# Last updated:     30/06/2023
+# ----------------------------------------------------------------------------
+
+set -euo pipefail
+
+ANSIBLE_MODULE=$(ansible-doc --list_files | \
+    fzf-tmux -m -p 80%,60% \
+    --prompt=" " \
+    --header="Select the ansible module:" \
+    --header-first )
+
+check_deps() {
+    if ! hash "$1" 2>/dev/null; then
+        echo "Error: This script requires $1!"
+        echo "Error: Please Install $1 using your distribution's package manager"
+        notify-send \
+            -t 5000 "Error: This script requires $1"
+        exit 1
+    fi
+}
+
+get_options ()
+{
+    echo "Split"
+    echo "Window"
+}
+
+open_in_window ()
+{
+    tmux new-window ansible-doc $ANSIBLE_MODULE
+    exit 0
+}
+
+open_in_split ()
+{
+    tmux split-window -h -l 50% ansible-doc $ANSIBLE_MODULE
+    exit 0
+}
+
+main ()
+{
+    check_deps fzf
+    check_deps ansible
+    check_deps tmux
+
+    CHOICE=$(get_options | \
+        fzf-tmux -m -p 80%,60% --prompt=" " \
+        --header="Where would you like to view the docs?" \
+        --header-first)
+
+    case "$CHOICE" in
+        Split)
+            open_in_split
+            ;;
+        Window)
+            open_in_window
+            ;;
+        *)
+            echo "invalid selection"
+            ;;
+    esac
+}
+
+main
