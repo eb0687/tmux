@@ -7,7 +7,7 @@
 SESSION=$(tmux list-sessions | fzf-tmux -m -p 80%,60% --prompt=" " --header="Active tmux sessions:" --header-first)
 
 if [[ -z $SESSION ]]; then
-    exit 0
+    exit 1
 fi
 
 if [ "$SESSION" -eq 0 ]; then

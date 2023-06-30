@@ -1,0 +1,36 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-nvim
+
+# Version:          0.1
+
+# Description:
+# opens a tmux split with the selected file in nvim
+
+# Dependencies:
+# - nvim
+# - tmux
+
+# Date created:     30/06/2023
+# Last updated:     30/06/2023
+# ----------------------------------------------------------------------------
+
+set -o errexit
+
+FILE=$(find . -maxdepth 3 | fzf-tmux -m -p 80%,60% --prompt=" " --header="Open file in NVIM:" --header-first)
+
+if [ -n "$TMUX" ]; then
+    tmux splitw -bv -l 70% nvim "$FILE"
+else
+    notify-send \
+        -t 1500 \
+        "Error" \
+        "Not in a tmux session"
+    exit 1
+fi
+
+
+
+
+
