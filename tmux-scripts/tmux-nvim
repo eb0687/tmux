@@ -18,7 +18,15 @@
 
 set -o errexit
 
-FILE=$(find . -maxdepth 3 | fzf-tmux -m -p 80%,60% --prompt=" " --header="Open file in NVIM:" --header-first)
+# NOTE: I do not fully understand the find command below, but it works.
+# SOURCE: https://unix.stackexchange.com/questions/468734/find-exclude-path-containing-specific-files
+FILE=$(find . \( -exec [ -f {}/.git ] \; -prune \) -o \( -name .git -prune \) -o -print | \
+
+        fzf-tmux -m \
+        -p 80%,60% \
+        --prompt=" " \
+        --header="Open file in NVIM:" \
+    --header-first)
 
 if [ -n "$TMUX" ]; then
     tmux splitw -bv -l 70% nvim "$FILE"
@@ -30,7 +38,5 @@ else
     exit 1
 fi
 
-
-
-
-
+# TODO:
+# - Create error checking to exit properly. It currently shows an error code based on the first line of this script
