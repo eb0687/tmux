@@ -20,7 +20,7 @@ set -o errexit
 
 # NOTE: I do not fully understand the find command below, but it works.
 # SOURCE: https://unix.stackexchange.com/questions/468734/find-exclude-path-containing-specific-files
-FILE=$(find . \( -exec [ -f {}/.git ] \; -prune \) -o \( -name .git -prune \) -o -print | \
+FILE=$(find . -maxdepth 3 -path ./.git -prune -o -print | \
 
         fzf-tmux -m \
         -p 80%,60% \
