@@ -20,7 +20,9 @@ set -o errexit
 
 # NOTE: I do not fully understand the find command below, but it works.
 # SOURCE: https://unix.stackexchange.com/questions/468734/find-exclude-path-containing-specific-files
-FILE=$(find . -maxdepth 3 -path ./.git -prune -o -print | \
+
+DIR="$(tmux display-message -p -F "#{pane_current_path}")"
+FILE=$(find "$DIR" -maxdepth 3 -path "$DIR"/.git -prune -o -print | \
 
         fzf-tmux -m \
         -p 80%,60% \
@@ -29,6 +31,7 @@ FILE=$(find . -maxdepth 3 -path ./.git -prune -o -print | \
     --header-first)
 
 if [ -n "$TMUX" ]; then
+    cd "$DIR" || exit
     tmux splitw -bv -l 70% nvim "$FILE"
 else
     notify-send \
