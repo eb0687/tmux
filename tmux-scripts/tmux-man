@@ -56,7 +56,7 @@ open_in_window ()
 
 open_in_split ()
 {
-    tmux split-window -h -l 50% man "$1"
+    tmux split-window -h -f -l 50% man "$1"
 }
 
 main ()
