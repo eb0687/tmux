@@ -53,7 +53,7 @@ open_in_window ()
 
 open_in_split ()
 {
-    tmux split-window -h -l 50% ansible-doc $ANSIBLE_MODULE
+    tmux split-window -h -f -l 50% ansible-doc $ANSIBLE_MODULE
 }
 
 main ()
