@@ -21,33 +21,45 @@ set -o errexit
 # NOTE: I do not fully understand the find command below, but it works.
 # SOURCE: https://unix.stackexchange.com/questions/468734/find-exclude-path-containing-specific-files
 
-DIR="$(tmux display-message -p -F "#{pane_current_path}")"
-FILE=$(find "$DIR" -maxdepth 3 -path "$DIR"/.git -prune -o -print \
-        | fzf-tmux -m \
-        -p 80%,60% \
-        --prompt=" " \
-        --header="Open file in NVIM:" \
-        --header-first \
+pane_cwd="$(tmux display-message -p -F "#{pane_current_path}")"
+
+tmux_pane_count="$(tmux list-panes | wc -l)"
+
+selected_file=$(find "$pane_cwd" \
+    -maxdepth 3 \
+    -path "$pane_cwd"/.git \
+    -prune -o -print \
+    | fzf-tmux -m \
+    -p 80%,60% \
+    --prompt=" " \
+    --header="Open file in NVIM:" \
+    --header-first \
     || exit )
 
-TMUX_PANE_COUNT="$(tmux list-panes | wc -l)"
-LAYOUT="fa00,173x43,0,0[173x30,0,0{57x30,0,0,90,57x30,58,0,87,57x30,116,0,86},173x12,0,31,92]"
+layout_max_panes="fa00,173x43,0,0[173x30,0,0{57x30,0,0,90,57x30,58,0,87,57x30,116,0,86},173x12,0,31,92]"
 
 if [ -n "$TMUX" ]; then
-    cd "$DIR" || exit
-    if [[ ($TMUX_PANE_COUNT -ge 3) ]]; then
-        tmux splitw -bh -l 50% -t 1 nvim "$FILE"
-        tmux select-layout $LAYOUT
-    elif [[ ($TMUX_PANE_COUNT -lt 4 ) && ($TMUX_PANE_COUNT -gt 1) ]]; then
-        tmux splitw -bh -l 50% -t 1 nvim "$FILE"
-    else
-        tmux splitw -bv -l 70% nvim "$FILE"
-    fi
+    cd "$pane_cwd" || exit
+    case "$tmux_pane_count" in
+        1)
+            tmux splitw -bv -l 70% nvim "$selected_file"
+            ;;
+        2)
+            tmux splitw -bh -l 50% -t 1 nvim "$selected_file"
+            ;;
+        3)
+            tmux splitw -bh -l 50% -t 1 nvim "$selected_file"
+            tmux select-layout "$layout_max_panes"
+            ;;
+        *)
+            echo "Too many tmux-splits are open."
+            echo "Try using nvim buffers/splits instead."
+            exit 1
+            ;;
+    esac
 else
-    notify-send \
-        -t 1500 \
-        "Error" \
-        "Not in a tmux session"
+    echo "You are not in a tmux session."
+    echo "Aborting script..."
     exit 1
 fi
 
