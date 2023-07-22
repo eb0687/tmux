@@ -1,9 +1,25 @@
 #!/usr/bin/env bash
 
+# NOTE:
+# search home directory for files
+# excluding all .git & .dotfile folders from results
+get_project_dirs ()
+{
+    find "$HOME" -type d \
+        -not \( -name .git -prune \) \
+        -not \( -name .dotfiles -prune \)
+}
+
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find ~/scripts ~/scripts/bash_scripts ~/ ~/github ~/.config ~/vagrant 2>/dev/null | fzf-tmux -p 80%,60%)
+    selected=$(get_project_dirs \
+            | fzf-tmux \
+            -p 80%,60% \
+            --prompt=" " \
+            --header="Open folder in a new session:" \
+            --header-first \
+        )
 fi
 
 if [[ -z $selected ]]; then
@@ -14,13 +30,12 @@ selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s $selected_name -c $selected
+    tmux new-session -s "$selected_name" -c "$selected"
     exit 0
 fi
 
-if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -ds $selected_name -c $selected
+if ! tmux has-session -t="$selected_name" 2> /dev/null; then
+    tmux new-session -ds "$selected_name" -c "$selected"
 fi
 
-tmux switch-client -t $selected_name
-
+tmux switch-client -t "$selected_name"
