@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-ssh-remote
+
+# Version:          0.1
+
+# Description:
+# The script is to be used on remote servers to better manage various tmux 
+# sessions.
+# Place this script on a remote server somewhere in your path and add the below
+# line to your .bash_profile or equivalent:
+
+# # If not inside a tmux session, and if the shell is interactive, then run the tmux menu script
+# if [[ -z "$TMUX" ]] && [[ $- == *i* ]]; then
+#     ~/tmux_menu.sh
+# fi
+
+# SOURCE: https://ostechnix.com/enhancing-ssh-login-with-a-tmux-session-selection-menu/
+
+# Dependencies:
+# are there any dependencies?
+
+# Date created:     03/10/2023
+# Last updated:     03/10/2023
+# ----------------------------------------------------------------------------
+
+# Get a list of existing tmux sessions:
+TMUX_SESSIONS=$(tmux ls | awk -F: '{print $1}')
+
+# If there are no existing sessions attach to a default session
+if [[ -z $TMUX_SESSIONS ]]; then
+    echo "No existing tmux sessions. Creating a new session called 'default'..."
+    tmux new -s default
+else
+    # If TMUX sessions already exists, present a menu to the user.
+    echo "Existing tmux sessions:"
+    echo "$TMUX_SESSIONS"
+    echo "Enter the name of the session you want to attach to, or <new> to create a new session: "
+    read -r user_input
+
+    # Attach to the chosen session, or create a new one:
+    # If you want to create a new session instead, type <new>
+    if [[ $user_input == "new" ]]; then
+        echo "Enter name for new session: "
+        read -r new_session_name
+        tmux new -s "$new_session_name"
+    else
+        tmux attach -t "$user_input"
+    fi
+fi
