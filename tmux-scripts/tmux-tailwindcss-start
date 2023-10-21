@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-tailwindcss-tmux
+
+# Version:          0.1
+
+# Description:
+# Sets up a Tmux session with my custom pane layout
+
+# Dependencies:
+# tmux
+# tailwindcss project folder
+
+# Date created:     21/10/2023
+# Last updated:     21/10/2023
+# ----------------------------------------------------------------------------
+
+# pane_cwd="$(tmux display-message -p -F "#{pane_current_path}")"
+
+# check if in a tmux session
+
+# not_in_tmux() {
+#     [ -z "$TMUX" ]
+# }
+
+# tmux splitw -bv -l 70% echo 'html file opened here!'
+# tmux splitw -bh -l 30% echo 'npm run dev command is run here!'
+
+window_name="build-css"
+current_session_name=$(tmux list-sessions | grep "attached" | awk -F':' '{print $1}')
+index_html='./public/index.html'
+
+buildcss_status() {
+    tmux list-windows | grep 'build-css'
+}
+
+if [[ -z $(find . -path './tailwind.config.js') ]]; then
+    echo "Not in a tailwindcss project directory ...  "
+    echo "exit 1"
+else
+    if [ -n "$(buildcss_status)" ] || [ "$(tmux list-panes | wc -l)" -gt 1 ]; then
+        echo ''
+        echo 'build-css TMUX window already exists'
+        echo 'navigate to build-css window & execute:'
+        echo 'npm run dev'
+        echo '*OR*'
+        echo 'you may have an existing nvim session open which is blocking this script from running'
+        exit 1
+    else
+        tmux splitw -bv -l 70% nvim $index_html
+        tmux neww -n "$window_name"
+        tmux send-keys -t "$current_session_name":"$window_name" "npm run dev" Enter
+        echo -e "\nRun Live-Server in neovim to begin session"
+    fi
+fi
