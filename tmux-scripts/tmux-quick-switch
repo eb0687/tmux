@@ -1,0 +1,28 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmux-quick-switch
+
+# Version:          0.1
+
+# Description:
+# Tmux script to jump between windows / panes in all sessions
+
+# Dependencies:
+# are there any dependencies?
+
+# Date created:     27/10/2023
+# Last updated:     27/10/2023
+# ----------------------------------------------------------------------------
+
+CHOICE=$(tmux list-panes -aF "#{session_name} #{window_name} #{window_id} #{pane_id}" \
+    | fzf-tmux -m -p 80%,60% \
+    --prompt=" " \
+    --header="Quick jump to session (session/window/win_id/pane_id):" \
+    --header-first)
+
+SESSION_NAME=$(echo "$CHOICE" | awk '{print $1}')
+WINDOW_ID=$(echo "$CHOICE" | awk '{print $3}')
+PANE_ID=$(echo "$CHOICE" | awk '{print $4}')
+
+tmux switch-client -t "$SESSION_NAME":"$WINDOW_ID"."$PANE_ID"
