@@ -29,6 +29,8 @@ selected_file=$(find "$pane_cwd" \
     -maxdepth 3 \
     -path "$pane_cwd"/.git \
     -prune -o -print \
+    -path "$pane_cwd"/node_modules \
+    -prune \
     | fzf-tmux -m \
     -p 80%,60% \
     --prompt=" " \
