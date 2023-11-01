@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tmks
 
-###############################################################
-# Tmux FZF Kill
-###############################################################
+# Version:          0.1
+
+# Description:
+# Uses fzf to kill tmux sessions
+
+# Dependencies:
+# - tmux
+# - fzf
+
+# Date created:     01/11/2023
+# Last updated:     01/11/2023
+# ----------------------------------------------------------------------------
 
 SELECTED_SESSIONS=$(tmux list-sessions -F "#S" | fzf-tmux -m -p 80%,60% --prompt=" " --header="Which tmux session do you want to kill?" --header-first)
 
@@ -11,6 +23,5 @@ if [ -n "$SELECTED_SESSIONS" ]; then
     IFS=$'\n'
     for SESSION in $SELECTED_SESSIONS; do
         tmux kill-session -t "$SESSION"
-        ta
     done
 fi
