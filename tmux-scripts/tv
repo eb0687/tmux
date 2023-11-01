@@ -1,0 +1,36 @@
+#!/bin/bash
+# ----------------------------------------------------------------------------
+# Contributors:     Eb
+# Project name:     tt
+
+# Version:          0.1
+
+# Description:
+# helper script that creates a .t file which is used by tmux-session-manager
+# alternative to tmux-nvim
+
+# Dependencies:
+# tmux
+# nvim
+# tmux-session-manager (https://github.com/joshmedeski/t-smart-tmux-session-manager)
+# tmux-session-manager dependency: zoxide
+
+# Date created:     01/11/2023
+# Last updated:     01/11/2023
+# ----------------------------------------------------------------------------
+
+read -r -d '' SCRIPT <<'EOF'
+#!/usr/bin/env bash
+tmux split-window -l 30%
+tmux select-pane -t :.+
+nvim -c 'Telescope find_files'
+EOF
+
+if [[ ! -f ./.t ]]; then
+    touch .t \
+        && chmod +x .t \
+        && echo -e "$SCRIPT" > .t \
+        && source ./.t
+fi
+
+./.t
