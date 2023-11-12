@@ -1,32 +1,15 @@
 #!/bin/bash
-# -----------------------------------------------------------------------------
-# Contributors:     Eb
-# Project name:     tmux-ip
-
-# Version:          0.1
-
-# Description:
-# tmux helper script to show the ip address in the tmux status bar.
-# SOURCE: https://stackoverflow.com/questions/21336126/linux-bash-script-to-extract-ip-address
-
-# Dependencies:
-# - tmux
-
-# Date created:     30/06/2023
-# Last updated:     30/06/2023
-# ----------------------------------------------------------------------------
 
 function ip_address() {
 
     # Loop through the interfaces and check for the interface that is up.
     for file in /sys/class/net/*; do
 
-        # iface=$(basename $file);
+        iface=$(basename "$file");
 
-        read status < $file/operstate;
+        read -r status < "$file"/operstate;
 
-        # [ "$status" == "up" ] && ip addr show $iface | awk '/inet /{printf $2" "}'
-        [ "$status" == "up" ] && ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}'
+        [ "$status" == "up" ] && ip addr show "$iface" | awk '/inet /{printf $2" "}'
 
     done
 
