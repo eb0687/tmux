@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sesh connect "$(
-    sesh list -t | fzf-tmux -p 60%,50% \
+    sesh list -t | fzf-tmux -p 100%,100% \
         --no-sort --ansi --border-label ' sesh ' --prompt '  ' \
         --header '  ^t tmux  ^x zoxide  ^d kill  ^f find  ^g configs ' \
         --color border:#7DAEA3 \
@@ -10,5 +10,8 @@ sesh connect "$(
         --bind 'ctrl-g:change-prompt(  )+reload(sesh list -c)' \
         --bind 'ctrl-x:change-prompt(  )+reload(sesh list -z)' \
         --bind 'ctrl-f:change-prompt(  )+reload(fd -H -d 2 -t d -E .Trash . ~)' \
-        --bind 'ctrl-d:execute(tmux kill-session -t {})+change-prompt(  )+reload(sesh list -t)'
+        --bind 'ctrl-d:execute(tmux kill-session -t {})+change-prompt(  )+reload(sesh list -t)' \
+        --preview-window 'right:60%' \
+        --preview 'sesh preview {}' \
+        --preview-window=nohidden \
 )"
