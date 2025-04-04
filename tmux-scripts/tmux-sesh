@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sesh connect "$(
-    sesh list -t | fzf-tmux -p 100%,100% \
+    sesh list -t | fzf-tmux -p 80%,80% \
         --no-sort --ansi --border-label ' sesh ' --prompt '  ' \
         --header '  ^t tmux  ^x zoxide  ^d kill  ^f find  ^g configs ' \
         --color border:#7DAEA3 \
