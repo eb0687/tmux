@@ -4,16 +4,19 @@
 windows=$(tmux list-windows -F '#{window_index} #{window_name}' | sed '/^$/d')
 
 # Run fzf on the window list
-selected=$(echo "$windows" | \
-    fzf-tmux --reverse \
-        -p 80%,50% \
-        --header '󱇛  Jump to a TMUX window' \
-        --prompt='  ' \
-        --color border:#7DAEA3 \
-        --preview "echo {} | cut -d' ' -f1 | xargs -I{} tmux capture-pane -e -t {} -p" \
-        --preview-window='right:60%' \
-        --preview-window=nohidden \
-        --bind 'ctrl-d:execute-silent(echo {} | cut -d" " -f1 | xargs tmux kill-window -t)+reload(tmux list-windows -F "#{window_index} #{window_name}")')
+selected=$(
+    echo "$windows" |
+        fzf-tmux --reverse \
+            -p 80%,50% \
+            --header '󱇛  Jump to a TMUX window' \
+            --prompt='  ' \
+            --color border:#7DAEA3 \
+            --preview "echo {} | cut -d' ' -f1 | xargs -I{} tmux capture-pane -e -t {} -p" \
+            --preview-window='right:60%' \
+            --preview-window=nohidden \
+            --bind 'ctrl-p:preview-half-page-up,ctrl-n:preview-half-page-down' \
+            --bind 'ctrl-d:execute-silent(echo {} | cut -d" " -f1 | xargs tmux kill-window -t)+reload(tmux list-windows -F "#{window_index} #{window_name}")'
+)
 
 # If user selected a window, extract index and jump
 if [[ -n "$selected" ]]; then
