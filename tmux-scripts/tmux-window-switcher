@@ -10,6 +10,7 @@ selected=$(
             -p 80%,50% \
             --header '󱇛  Jump to a TMUX window' \
             --prompt='  ' \
+            --border-label=' Tmux Windows ' \
             --color border:#7DAEA3 \
             --preview "echo {} | cut -d' ' -f1 | xargs -I{} tmux capture-pane -e -t {} -p" \
             --preview-window='right:60%' \
