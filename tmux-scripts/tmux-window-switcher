@@ -10,6 +10,9 @@ selected=$(echo "$windows" | \
         --header '󱇛  Jump to a TMUX window' \
         --prompt='  ' \
         --color border:#7DAEA3 \
+        --preview "echo {} | cut -d' ' -f1 | xargs -I{} tmux capture-pane -e -t {} -p" \
+        --preview-window='right:60%' \
+        --preview-window=nohidden \
         --bind 'ctrl-d:execute(echo {} | cut -d" " -f1 | xargs tmux kill-window -t)+abort')
 
 # If user selected a window, extract index and jump
@@ -17,4 +20,3 @@ if [[ -n "$selected" ]]; then
     index=$(echo "$selected" | cut -d' ' -f1)
     tmux select-window -t "$index"
 fi
-
