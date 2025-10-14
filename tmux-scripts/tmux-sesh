@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sesh connect "$(
-    sesh list -t | fzf-tmux -p 80%,50% \
+    sesh list -t | fzf-tmux -p 70%,50% \
         --no-sort --ansi --border-label ' sesh ' --prompt '  ' \
         --header '  ^t tmux  ^x zoxide  ^d kill  ^f find  ^g configs  ^r root' \
         --color border:#7DAEA3 \
@@ -15,5 +15,6 @@ sesh connect "$(
         --bind 'ctrl-p:preview-half-page-up,ctrl-n:preview-half-page-down' \
         --preview-window 'right:60%' \
         --preview 'sesh preview {}' \
-        --preview-window=nohidden
+        --preview-window=hidden
+        # --preview-window=nohidden
 )"
