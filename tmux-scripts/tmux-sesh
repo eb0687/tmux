@@ -60,12 +60,11 @@ selection="$(
 
 [ "$selection" = "" ] && exit 0
 
-# Harpoon entry: session=path:window.pane
-if [[ "$selection" == *"="*":"* ]]; then
+if [[ "$selection" == *"="*":"*"."* ]]; then
     session="${selection%%=*}"
-    pane="${selection##*:}"
-    exec tmux switch-client -t "${session}:${pane}"
+    after_colon="${selection##*:}"
+    window="${after_colon%%.*}"
+    exec tmux switch-client -t "$session:$window"
 fi
 
-# Default: normal sesh behavior
 exec sesh connect "$selection"
