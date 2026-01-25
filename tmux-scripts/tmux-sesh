@@ -60,11 +60,18 @@ selection="$(
 
 [ "$selection" = "" ] && exit 0
 
-if [[ "$selection" == *"="*":"*"."* ]]; then
-    session="${selection%%=*}"
-    after_colon="${selection##*:}"
-    window="${after_colon%%.*}"
-    exec tmux switch-client -t "$session:$window"
+# Expected format:
+# session=/path:window_name.window_index.pane_index
+if [[ "$selection" == *"="*":"*"."*"."* ]]; then
+    session="${selection%%=*}"        # eb
+    after_colon="${selection##*:}"    # editor.1.2
+
+    window_name="${after_colon%%.*}"  # editor
+    rest="${after_colon#*.}"          # 1.2
+    pane_index="${rest##*.}"          # 2
+
+    exec tmux switch-client -t "${session}:${window_name}.${pane_index}"
 fi
 
+# Fallback to normal sesh
 exec sesh connect "$selection"
