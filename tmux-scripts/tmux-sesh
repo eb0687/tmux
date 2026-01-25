@@ -19,11 +19,33 @@
 #         # --preview-window=nohidden
 # )"
 
-sesh connect "$(
+# sesh connect "$(
+#     sesh list -t --icons | fzf-tmux -p 70%,50% \
+    #         --no-sort --ansi --border-label ' sesh ' --prompt '  ' \
+    #         --color border:#7DAEA3 \
+    #         --header 'Sessions'\
+    #         --header-first \
+    #         --bind 'tab:down,btab:up' \
+    #         --bind 'ctrl-t:change-prompt(  )+change-header(Sessions)+reload(sesh list -t --icons)' \
+    #         --bind 'ctrl-g:change-prompt(  )+change-header(Custom)+reload(sesh list -c --icons)' \
+    #         --bind 'ctrl-x:change-prompt(  )+change-header(Zoxide)+reload(sesh list -z --icons)' \
+    #         --bind 'ctrl-f:change-prompt(  )+change-header(Find)+reload(fd -H -d 2 -t d -E .Trash . ~)' \
+    #         --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-header(Kill Session)+change-prompt(  )+reload(sesh list -t --icons)' \
+    #         --bind 'ctrl-p:preview-half-page-up,ctrl-n:preview-half-page-down' \
+    #         --bind 'ctrl-h:change-header(Harpoon)+change-prompt(H  )+reload(harpoon -L)' \
+    #         --preview-window 'right:60%' \
+    #         --preview 'sesh preview {}' \
+    #         # --preview-window=hidden
+#         # --preview-window=nohidden
+# )"
+
+selection="$(
     sesh list -t --icons | fzf-tmux -p 70%,50% \
-        --no-sort --ansi --border-label ' sesh ' --prompt '  ' \
+        --no-sort --ansi \
+        --border-label ' sesh ' \
+        --prompt '  ' \
         --color border:#7DAEA3 \
-        --header 'Sessions'\
+        --header 'Sessions' \
         --header-first \
         --bind 'tab:down,btab:up' \
         --bind 'ctrl-t:change-prompt(  )+change-header(Sessions)+reload(sesh list -t --icons)' \
@@ -31,9 +53,19 @@ sesh connect "$(
         --bind 'ctrl-x:change-prompt(  )+change-header(Zoxide)+reload(sesh list -z --icons)' \
         --bind 'ctrl-f:change-prompt(  )+change-header(Find)+reload(fd -H -d 2 -t d -E .Trash . ~)' \
         --bind 'ctrl-d:execute(tmux kill-session -t {2..})+change-header(Kill Session)+change-prompt(  )+reload(sesh list -t --icons)' \
-        --bind 'ctrl-p:preview-half-page-up,ctrl-n:preview-half-page-down' \
+        --bind 'ctrl-h:change-prompt(󰀱  )+change-header(Harpoon)+reload(harpoon -L)' \
         --preview-window 'right:60%' \
-        --preview 'sesh preview {}' \
-        # --preview-window=hidden
-        # --preview-window=nohidden
+        --preview 'sesh preview {}'
 )"
+
+[ "$selection" = "" ] && exit 0
+
+# Harpoon entry: session=path:window.pane
+if [[ "$selection" == *"="*":"* ]]; then
+    session="${selection%%=*}"
+    pane="${selection##*:}"
+    exec tmux switch-client -t "${session}:${pane}"
+fi
+
+# Default: normal sesh behavior
+exec sesh connect "$selection"
